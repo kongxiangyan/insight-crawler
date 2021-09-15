@@ -1,1 +1,1 @@
-# Haskell Template
+# Insights Grappler

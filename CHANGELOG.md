@@ -1,4 +1,4 @@
-# Haskell Template
+# Insights Grappler
 
 ## 0.0.1.0
 
