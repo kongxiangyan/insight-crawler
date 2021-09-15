@@ -1,0 +1,119 @@
+{-# START_FILE package.yaml #-}
+# @refer: https://github.com/sol/hpack
+
+# spec-version:
+name:                {{name}}
+version:             0.0.1.0
+# synopsis:          Short description of your package
+description:         See README at <https://github.com/{{github-username}}{{^github-username}}we-mobius{{/github-username}}/{{name}}#readme>
+category:            Mobius, {{category}}{{^category}}Service{{/category}}
+# stability: Stable
+homepage:            https://github.com/{{github-username}}{{^github-username}}we-mobius{{/github-username}}/{{name}}#readme
+bug-reports:         https://github.com/{{github-username}}{{^github-username}}we-mobius{{/github-username}}/{{name}}/issues
+author:
+  - {{author-name}}{{^author-name}}Cigaret{{/author-name}}
+maintainer:          {{author-email}}{{^author-email}}kcigaret@outlook.com{{/author-email}}
+copyright:           {{year}}{{^year}}2021{{/year}} {{author-name}}{{^author-name}}Cigaret{{/author-name}}
+license:             GPL-3.0
+license-file:        LICENSE
+
+tested-with:         GHC == 8.10.4
+build-type:          Simple
+
+extra-source-files:
+  - CHANGELOG.md
+  - README.md
+# extra-doc-files: []
+# data-files: []
+# data-dir:
+
+github: {{github-username}}{{^github-username}}we-mobius{{/github-username}}/{{name}}
+# git:
+
+# custom-setup: {}
+# flags: {}
+
+ghc-options: -Wall
+
+library:
+  source-dirs: lib
+  ghc-options: []
+#  exposed:
+#  visibility:
+#  exposed-modules: []
+#  generated-exposed-modules: []
+#  other-modules: []
+#  generated-other-modules: []
+#  reexported-modules: []
+#  signature:
+
+dependencies:
+  - base >= 4.7 && < 5
+
+executables:
+  {{name}}-exe:
+    main:             Main.hs
+    source-dirs:      app
+    ghc-options:      []
+#    other-modules:
+#    generated-other-modules:
+    dependencies:
+      - {{name}}
+
+tests:
+  {{name}}-test:
+    main:             Spec.hs
+    source-dirs:      test
+    ghc-options:      []
+    dependencies:
+      - {{name}}
+
+{-# START_FILE Setup.hs #-}
+import Distribution.Simple
+main = defaultMain
+
+{-# START_FILE app/Main.hs #-}
+module Main where
+
+main :: IO ()
+main = do
+  putStrLn "Hello, {{name}}!"
+
+{-# START_FILE lib/Lib.hs #-}
+module Lib
+    ( someFunc
+    ) where
+
+someFunc :: IO ()
+someFunc = putStrLn "someFunc"
+
+{-# START_FILE test/Spec.hs #-}
+main :: IO ()
+main = putStrLn "Test suite not yet implemented"
+
+{-# START_FILE CHANGELOG.md #-}
+# {{name}}
+
+## 0.0.1.0
+
+- init package
+
+{-# START_FILE README.md #-}
+# {{name}}
+
+{-# START_FILE LICENSE #-}
+{{name}}
+Copyright (C) {{year}}{{^year}}2021{{/year}}  {{author-name}}{{^author-name}}Cigaret{{/author-name}}
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
