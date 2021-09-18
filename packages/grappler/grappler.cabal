@@ -1,0 +1,71 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           grappler
+version:        0.0.1.0
+description:    See README at <https://github.com/kongxiangyan/insights-grappler#readme>
+category:       Mobius, Service
+homepage:       https://github.com/kongxiangyan/insights-grappler#readme
+bug-reports:    https://github.com/kongxiangyan/insights-grappler/issues
+author:         Cigaret
+maintainer:     kcigaret@outlook.com
+copyright:      2021 Cigaret
+license:        GPL-3.0
+license-file:   LICENSE
+build-type:     Simple
+tested-with:
+    GHC == 8.10.4
+extra-source-files:
+    CHANGELOG.md
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/kongxiangyan/insights-grappler
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_grappler
+  hs-source-dirs:
+      lib
+  ghc-options: -Wall
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable grappler-exe
+  main-is: Main.hs
+  other-modules:
+      Gov.Taiyuan
+      Gov.Top
+      Paths_grappler
+  hs-source-dirs:
+      app
+  ghc-options: -Wall
+  build-depends:
+      base >=4.7 && <5
+    , grappler
+    , http-client
+    , http-conduit
+    , http-types
+    , tagsoup
+    , utf8-string
+  default-language: Haskell2010
+
+test-suite grappler-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_grappler
+  hs-source-dirs:
+      test
+  ghc-options: -Wall
+  build-depends:
+      base >=4.7 && <5
+    , grappler
+  default-language: Haskell2010

@@ -1,0 +1,73 @@
+# @refer: https://github.com/sol/hpack
+
+# spec-version:
+name:                grappler
+version:             0.0.1.0
+# synopsis:          Short description of your package
+description:         See README at <https://github.com/kongxiangyan/insights-grappler#readme>
+category:            Mobius, Service
+# stability: Stable
+homepage:            https://github.com/kongxiangyan/insights-grappler#readme
+bug-reports:         https://github.com/kongxiangyan/insights-grappler/issues
+author:
+  - Cigaret
+maintainer:          kcigaret@outlook.com
+copyright:           2021 Cigaret
+license:             GPL-3.0
+license-file:        LICENSE
+
+tested-with:         GHC == 8.10.4
+build-type:          Simple
+
+extra-source-files:
+  - CHANGELOG.md
+  - README.md
+# extra-doc-files: []
+# data-files: []
+# data-dir:
+
+github: kongxiangyan/insights-grappler
+# git:
+
+# custom-setup: {}
+# flags: {}
+
+ghc-options: -Wall
+
+library:
+  source-dirs: lib
+  ghc-options: []
+#  exposed:
+#  visibility:
+#  exposed-modules: []
+#  generated-exposed-modules: []
+#  other-modules: []
+#  generated-other-modules: []
+#  reexported-modules: []
+#  signature:
+
+dependencies:
+  - base >= 4.7 && < 5
+
+executables:
+  grappler-exe:
+    main:             Main.hs
+    source-dirs:      app
+    ghc-options:      []
+#    other-modules:
+#    generated-other-modules:
+    dependencies:
+      - grappler
+      - http-client
+      - http-conduit
+      - http-types
+      - utf8-string
+      - tagsoup
+
+tests:
+  grappler-test:
+    main:             Spec.hs
+    source-dirs:      test
+    ghc-options:      []
+    dependencies:
+      - grappler
