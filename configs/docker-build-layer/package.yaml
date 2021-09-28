@@ -1,0 +1,41 @@
+# @refer: https://github.com/sol/hpack
+
+# spec-version:
+name:                docker-build-layer
+version:             0.0.1.0
+# synopsis:          Short description of your package
+description:         See README at <https://github.com/we-mobius/haskell-template#readme>
+category:            Mobius, Auxiliary
+# stability: Stable
+homepage:            https://github.com/we-mobius/haskell-template#readme
+bug-reports:         https://github.com/we-mobius/haskell-template/issues
+author:
+  - Cigaret
+maintainer:          kcigaret@outlook.com
+copyright:           2021 Cigaret
+license:             GPL-3.0
+license-file:        LICENSE
+
+# tested-with:         GHC == 8.10.4
+build-type:          Simple
+
+extra-source-files:  []
+
+github: we-mobius/haskell-template
+
+ghc-options: -Wall
+
+dependencies:
+  - base >= 4.7 && < 5
+  - http-client
+  - http-conduit
+  - http-types
+  - utf8-string
+  - tagsoup
+
+executables:
+  grappler-exe:
+    main:             Main.hs
+    source-dirs:      app
+    ghc-options:      []
+    dependencies:     []

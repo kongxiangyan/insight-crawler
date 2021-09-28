@@ -35,6 +35,9 @@ github: {{github-username}}{{^github-username}}we-mobius{{/github-username}}/{{n
 
 ghc-options: -Wall
 
+dependencies:
+  - base >= 4.7 && < 5
+
 library:
   source-dirs: lib
   ghc-options: []
@@ -46,9 +49,6 @@ library:
 #  generated-other-modules: []
 #  reexported-modules: []
 #  signature:
-
-dependencies:
-  - base >= 4.7 && < 5
 
 executables:
   {{name}}-exe:

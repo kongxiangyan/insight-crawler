@@ -29,13 +29,35 @@ source-repository head
 library
   exposed-modules:
       Lib
+      TencentCloud.CloudBase.Database
+      TencentCloud.CloudBase.Function
+      TencentCloud.CloudBase.Storage
+      TencentCloud.Request.Base
+      TencentCloud.Request.CloudBase
+      TencentCloud.Sign.Base
+      TencentCloud.Sign.CloudBase
+      Utils.Logger
+      Utils.Path
+      Utils.Time
   other-modules:
       Paths_grappler
   hs-source-dirs:
       lib
   ghc-options: -Wall
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.14 && <5
+    , bytestring
+    , cryptonite
+    , directory
+    , filepath
+    , http-client
+    , http-client-tls
+    , http-types
+    , memory
+    , text
+    , time
+    , utf8-string
   default-language: Haskell2010
 
 executable grappler-exe
@@ -43,17 +65,26 @@ executable grappler-exe
   other-modules:
       Gov.Taiyuan
       Gov.Top
+      Storage.TCBDB
       Paths_grappler
   hs-source-dirs:
       app
   ghc-options: -Wall
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.14 && <5
+    , bytestring
+    , cryptonite
+    , directory
+    , filepath
     , grappler
     , http-client
+    , http-client-tls
     , http-conduit
     , http-types
+    , memory
     , tagsoup
+    , time
     , utf8-string
   default-language: Haskell2010
 
@@ -66,6 +97,6 @@ test-suite grappler-test
       test
   ghc-options: -Wall
   build-depends:
-      base >=4.7 && <5
+      base >=4.14 && <5
     , grappler
   default-language: Haskell2010

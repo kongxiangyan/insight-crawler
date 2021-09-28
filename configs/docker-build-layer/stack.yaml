@@ -4,11 +4,10 @@ drop-packages: []
 user-message: ""
 
 packages: [
-  "./packages/grappler"
+  "."
 ]
 
 extra-deps: []
-
 flags: {}
 ghc-options: {
   "$everything": -haddock

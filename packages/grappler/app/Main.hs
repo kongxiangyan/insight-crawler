@@ -2,13 +2,28 @@
 {-stack
   script
   --resolver lts-18.6
-  --package utf8-string
-  --package http-client,http-conduit,http-types
+  --package time
+  --package memory
+  --package utf8-string,bytestring,directory,filepath
+  --package http-client,http-client-tls,http-conduit,http-types
   --package tagsoup
+  --package cryptonite
+  --package aeson
 -}
 
-import qualified Gov.Top as Top
+import           Control.Concurrent
+import           Control.Monad
+import qualified Gov.Top            as Top
+import qualified Storage.TCBDB      as DB
 
-main :: IO ()
+-- main :: IO ()
 main = do
-  Top.grap
+  DB.getTestItem
+  DB.getLatestItem
+-- main = forever $
+--   forkIO (do
+--     grappledData <- Top.grap
+--     latestItem <- DB.getLatestItem
+--     return ()
+--   )
+--   >> threadDelay (60 * 10 * 1000000)

@@ -2,8 +2,6 @@
 
 module Gov.Taiyuan where
 
-import qualified Data.ByteString.Lazy.UTF8 as UTF8
-import           Data.Foldable
 import           Network.HTTP.Client
 import           Network.HTTP.Types.Header
 

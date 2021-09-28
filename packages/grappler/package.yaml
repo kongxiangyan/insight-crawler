@@ -34,9 +34,25 @@ github: kongxiangyan/insights-grappler
 
 ghc-options: -Wall
 
+dependencies:
+  - base >= 4.14 && < 5
+
 library:
   source-dirs: lib
   ghc-options: []
+  dependencies:
+    - cryptonite
+    - memory
+    - utf8-string
+    - bytestring
+    - http-types
+    - http-client
+    - http-client-tls
+    - time
+    - directory
+    - filepath
+    - aeson
+    - text
 #  exposed:
 #  visibility:
 #  exposed-modules: []
@@ -45,9 +61,6 @@ library:
 #  generated-other-modules: []
 #  reexported-modules: []
 #  signature:
-
-dependencies:
-  - base >= 4.7 && < 5
 
 executables:
   grappler-exe:
@@ -59,10 +72,19 @@ executables:
     dependencies:
       - grappler
       - http-client
+      - http-client-tls
       - http-conduit
       - http-types
       - utf8-string
+      # - base16-bytestring
+      - memory
+      - bytestring
       - tagsoup
+      - directory
+      - filepath
+      - time
+      - cryptonite
+      - aeson
 
 tests:
   grappler-test:

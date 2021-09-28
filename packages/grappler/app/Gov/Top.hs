@@ -2,23 +2,27 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Gov.Top
-  ( grap
+  ( grap,
+    Item (Item)
   ) where
 
-import           Control.Concurrent
-import           Control.Monad
-import qualified Data.ByteString.Lazy.UTF8 as UTF8
+import qualified Data.ByteString.Lazy.UTF8 as BU
 import           Data.Char
+import           Data.Time
 import           Network.HTTP.Client
 import           Network.HTTP.Types.Header
 import           Text.HTML.TagSoup
+import           Utils.Logger
+import           Utils.Path
+import           Utils.Time
 
-type Name = String
-type UrlString =  String
+scopedLog :: String -> IO ()
+scopedLog = stdLog "Top Grappler"
+
 data Target
   = Target
-      { name :: Name
-      , url  :: UrlString
+      { name :: String
+      , url  :: String
       }
   deriving (Show)
 type Targets = [Target]
@@ -37,12 +41,13 @@ setCommonProxy =  managerSetProxy  (useProxy Proxy {
 setCommonManager :: ManagerSettings -> ManagerSettings
 setCommonManager settings = settings { managerResponseTimeout = responseTimeoutMicro (30 * 1000000) }
 
-type RequestResponse = Response UTF8.ByteString
+type RequestResponse = Response BU.ByteString
 data RequestResult
   = RequestResult
       { target   :: Target
       , request  :: Request
       , response :: RequestResponse
+      , grapTime :: ZonedTime
       }
   deriving (Show)
 
@@ -62,24 +67,27 @@ prepareRequests = map (\target -> do
 
     response <- httpLbs request manager
 
-    return (RequestResult target request response)
+    RequestResult target request response <$> getZonedTime
   )
 
-execRequest :: IO [(Target, Request, RequestResponse, String)]
+execRequest :: IO [(Target, Request, RequestResponse, String, ZonedTime)]
 execRequest = do
   responses <- sequenceA $ prepareRequests targets
-  traverse (\RequestResult { target, request, response } -> do
-    putStrLn $ "The target url was:" ++ url target
-    putStrLn $ "The request info was:" ++ show request
-    putStrLn $ "The response status was: " ++ show (responseStatus response)
+  traverse (\RequestResult { target, request, response, grapTime } -> do
 
-    let body = UTF8.toString $ responseBody response
+    scopedLog $ "The grap target was: " ++ show target
+    scopedLog $ "The grap time was: " ++ generalFormatTime grapTime
+    scopedLog $ "The response status was: " ++ show (responseStatus response)
 
-    writeFile ("./packages/grappler/data/" ++ "TopGov" ++ ".txt")  body
+    let body = BU.toString $ responseBody response
 
-    putStrLn "Done"
+    destination <- pathInAppDataDir "TopGov.txt"
+    writeFile destination body
 
-    return (target, request, response, body)) responses
+    scopedLog $ "Response body write to: " ++ destination
+    scopedLog "Request Execute Done!"
+
+    return (target, request, response, body, grapTime)) responses
 
 parseBody :: String -> [Tag String]
 parseBody = parseTags
@@ -98,35 +106,49 @@ extractList =
   takeWhile (~/= TagOpen "span" [("class" :: String, "public_more")]) .
   dropWhile (~/= TagOpen "div" [("class" :: String, "news_box")] )
 
+type ItemTitle = String
+type ItemUrl = String
+-- TODO: 把时间都改成 Int 格式
+type ItemPublishTime = String
+type ItemGrapTime = String
 newtype Item
-  = Item (String, String, String)
-extractData :: [Tag String] -> Item
-extractData tags = Item (title, url, date)
+  = Item (ItemTitle, ItemUrl, ItemPublishTime, ItemGrapTime)
+
+extractData :: ItemGrapTime -> [Tag String] -> Item
+extractData grapTime tags = Item (title, url, publishTime, grapTime)
   where
     url = fromAttrib "href" . head $ tags
     title = fromTagText (tags !! 1)
-    date = fromTagText (tags !! 2)
+    publishTime = fromTagText (tags !! 2)
 
 instance Show Item where
-  show (Item (title, url , date)) = "(" ++ title ++ ", " ++ url ++ ", " ++ date ++ ")"
+  show (Item (title, url, publishTime, grapTime)) =
+    "(" ++ title ++ ", " ++ url ++ ", " ++ publishTime ++ ", " ++ grapTime ++ ")"
 
 formatData :: Item -> Item
-formatData (Item (title, url, date)) = Item (formatTitle title, formatUrl url, formatDate date)
-  where
-    formatTitle = trim
-    -- 有的连接没有 domain，需要进行补全
-    formatUrl []       = []
-    formatUrl ('/':xs) = trim $ "http://www.gov.cn/" ++ xs
-    formatUrl u        = trim u
-    formatDate = trim
-    trim = filter (not . isSpace)
+formatData (Item (title, url, publishTime, grapTime)) =
+  Item (formatTitle title, formatUrl url, formatPublishTime publishTime, grapTime)
+    where
+      formatTitle = trim
+      -- 有的链接没有 domain，需要进行补全
+      formatUrl []       = []
+      formatUrl ('/':xs) = trim $ "http://www.gov.cn/" ++ xs
+      formatUrl u        = trim u
+      formatPublishTime = trim
+      trim = filter (not . isSpace)
 
-grap :: IO ()
-grap = forever $
-  forkIO (do
-    [(target, _, _, body)] <- execRequest
-    print target
-    let tags = map (formatData . extractData) . extractList $ parseBody body
-    print tags
-    writeFile "./packages/grappler/data/tags.tmp" (show tags))
-  >> threadDelay (60 * 10 * 1000000)
+grap :: IO [Item]
+grap = do
+  [(_, _, _, body, grapTime)] <- execRequest
+
+  let formattedData = map (formatData . extractData (generalFormatTime grapTime)) . extractList $ parseBody body
+      count = length formattedData
+
+  destination <- pathInAppDataDir "formattedData"
+  writeFile destination (show formattedData)
+
+  scopedLog $ "Extracted formattedData write to: " ++ destination
+  scopedLog $ "Total count of data: " ++ show count
+  scopedLog "Grap Done!"
+
+  return formattedData
