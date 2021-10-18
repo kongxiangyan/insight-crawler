@@ -3,7 +3,8 @@
 
 module Gov.Top
   ( grap,
-    Item (Item)
+    Item (..),
+    emptyItem
   ) where
 
 import qualified Data.ByteString.Lazy.UTF8 as BU
@@ -76,7 +77,7 @@ execRequest = do
   traverse (\RequestResult { target, request, response, grapTime } -> do
 
     scopedLog $ "The grap target was: " ++ show target
-    scopedLog $ "The grap time was: " ++ generalFormatTime grapTime
+    scopedLog $ "The grap time(after response) was: " ++ generalFormatTime grapTime
     scopedLog $ "The response status was: " ++ show (responseStatus response)
 
     let body = BU.toString $ responseBody response
@@ -85,13 +86,15 @@ execRequest = do
     writeFile destination body
 
     scopedLog $ "Response body write to: " ++ destination
-    scopedLog "Request Execute Done!"
+    scopedLog "Request Execute Done! \n"
 
     return (target, request, response, body, grapTime)) responses
 
+-- 将 HTML 转换为可以进一步解析的格式
 parseBody :: String -> [Tag String]
 parseBody = parseTags
 
+-- 提取合适的部分
 extractList :: [Tag String] -> [[Tag String]]
 extractList =
   map (
@@ -108,25 +111,32 @@ extractList =
 
 type ItemTitle = String
 type ItemUrl = String
--- TODO: 把时间都改成 Int 格式
-type ItemPublishTime = String
-type ItemGrapTime = String
+type ItemPublishTime = Integer
+type ItemGrapTime = Integer
+-- RawItem 中的数据是未格式化的，数字、日期等全部都是字符串格式
+newtype RawItem
+  = RawItem (ItemTitle, ItemUrl, String, ItemGrapTime)
+  deriving (Show)
+-- Item 中的数据是格式化之后的，数字、日期等具备正确的格式，能够直接被程序的其它部分消费
 newtype Item
   = Item (ItemTitle, ItemUrl, ItemPublishTime, ItemGrapTime)
 
-extractData :: ItemGrapTime -> [Tag String] -> Item
-extractData grapTime tags = Item (title, url, publishTime, grapTime)
+instance Show Item where
+  show (Item (title, url, publishTime, grapTime)) =
+    "(" ++ title ++ ", " ++ url ++ ", " ++ show publishTime ++ ", " ++ show grapTime ++ ")"
+
+emptyItem :: Item
+emptyItem = Item ("", "", 0, 0)
+
+extractData :: ItemGrapTime -> [Tag String] -> RawItem
+extractData grapTime tags = RawItem (title, url, publishTime, grapTime)
   where
     url = fromAttrib "href" . head $ tags
     title = fromTagText (tags !! 1)
     publishTime = fromTagText (tags !! 2)
 
-instance Show Item where
-  show (Item (title, url, publishTime, grapTime)) =
-    "(" ++ title ++ ", " ++ url ++ ", " ++ publishTime ++ ", " ++ grapTime ++ ")"
-
-formatData :: Item -> Item
-formatData (Item (title, url, publishTime, grapTime)) =
+formatData :: RawItem -> Item
+formatData (RawItem (title, url, publishTime, grapTime)) =
   Item (formatTitle title, formatUrl url, formatPublishTime publishTime, grapTime)
     where
       formatTitle = trim
@@ -134,14 +144,16 @@ formatData (Item (title, url, publishTime, grapTime)) =
       formatUrl []       = []
       formatUrl ('/':xs) = trim $ "http://www.gov.cn/" ++ xs
       formatUrl u        = trim u
-      formatPublishTime = trim
+      -- 无法解析的发布日期统一赋值为 0（即 CST 1970-01-01 08:00:00）
+      formatPublishTime = maybe 0 getTimestamp . parseGeneralFormatDate . trim
       trim = filter (not . isSpace)
 
 grap :: IO [Item]
 grap = do
   [(_, _, _, body, grapTime)] <- execRequest
 
-  let formattedData = map (formatData . extractData (generalFormatTime grapTime)) . extractList $ parseBody body
+  let formattedData =
+        map (formatData . extractData (getTimestamp . zonedTimeToUTC $ grapTime)) . extractList $ parseBody body
       count = length formattedData
 
   destination <- pathInAppDataDir "formattedData"

@@ -85,6 +85,9 @@ executables:
       - time
       - cryptonite
       - aeson
+      - unordered-containers
+      - vector
+      - tuple
 
 tests:
   grappler-test:

@@ -5,11 +5,13 @@ module TencentCloud.Request.Base
     hXCBAuthorization, hXCBSessionToken, hXCBTimeStamp,
     RequestSettings (..),
     defaultRequestSettings, getRequestSettings, postRequestSettings,
-    setMethod, setRegion, setPath, setEnv
+    setMethod, setRegion, setPath, setEnv,
+    authorizeRequestSettings, authorizedGetRequestSettings, authorizedPostRequestSettings
   ) where
 
 import qualified Data.ByteString.Lazy.UTF8 as LBU
 import           Network.HTTP.Types.Header
+import qualified System.Environment        as Env
 
 hXCBAuthorization, hXCBSessionToken, hXCBTimeStamp :: HeaderName
 hXCBAuthorization = "X-CloudBase-Authorization"
@@ -61,3 +63,21 @@ setPath s p = s { path = p }
 
 setMethod :: RequestSettings -> String -> RequestSettings
 setMethod s m = s { method = m }
+
+authorizeRequestSettings :: RequestSettings -> IO RequestSettings
+authorizeRequestSettings baseSettings = do
+  -- 从环境变量中获取云服务资源操作密钥
+  _secretId <- Env.getEnv "TC_SECRET_ID"
+  _secretKey <- Env.getEnv "TC_SECRET_KEY"
+  _envId <- Env.getEnv "TCB_ENV_ID"
+
+  return baseSettings {
+    secretId = _secretId,
+      secretKey = _secretKey,
+    envId = _envId
+  }
+
+authorizedGetRequestSettings :: IO RequestSettings
+authorizedGetRequestSettings = authorizeRequestSettings getRequestSettings
+authorizedPostRequestSettings :: IO RequestSettings
+authorizedPostRequestSettings = authorizeRequestSettings postRequestSettings

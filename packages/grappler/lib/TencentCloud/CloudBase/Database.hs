@@ -1,13 +1,15 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module TencentCloud.CloudBase.Database
   ( query, queryWithoutEncode
   ) where
 
-import qualified Data.Aeson           as A
+import Data.Aeson
 import qualified Data.ByteString.Lazy as LBS
-import qualified Data.Text            as T
+-- import qualified Data.Text            as T
 
-queryWithoutEncode :: A.ToJSON v => v -> A.Value
-queryWithoutEncode _query = A.object [T.pack "query" A..= _query]
+queryWithoutEncode :: ToJSON v => v -> Value
+queryWithoutEncode _query = object ["query" .= _query]
 
 query :: String -> LBS.ByteString
-query = A.encode . queryWithoutEncode
+query = encode . queryWithoutEncode

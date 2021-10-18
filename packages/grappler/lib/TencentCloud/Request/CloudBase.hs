@@ -37,9 +37,9 @@ get R.RequestSettings { R.secretId, R.secretKey, R.region, R.envId, R.path, R.me
 
   response <- httpLbs request manager
 
-  putStrLn $ "[TencentCloud.Request]" ++ url ++ "\n"
+  putStrLn $ "[TencentCloud.Request] " ++ url ++ "\n"
 
-  putStrLn $ "The status code was: " ++ show (statusCode $ responseStatus response)
+  putStrLn $ " - The status code was: " ++ show (statusCode $ responseStatus response)
 
   let body = LBU.toString $ responseBody response
 
@@ -67,9 +67,9 @@ post R.RequestSettings { R.secretId, R.secretKey, R.region, R.envId, R.path, R.m
 
   response <- httpLbs request manager
 
-  putStrLn $ "[TencentCloud.Request]" ++ url ++ "\n"
+  putStrLn $ "[TencentCloud.Request] " ++ url ++ "\n"
 
-  putStrLn $ "The status code was: " ++ show (statusCode $ responseStatus response)
+  putStrLn $ " - The status code was: " ++ show (statusCode $ responseStatus response)
 
   let body = LBU.toString $ responseBody response
 
