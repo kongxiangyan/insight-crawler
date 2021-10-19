@@ -28,10 +28,22 @@ ghc-options: -Wall
 dependencies:
   - base >= 4.7 && < 5
   - http-client
+  - http-client-tls
   - http-conduit
   - http-types
   - utf8-string
+  - memory
+  - bytestring
   - tagsoup
+  - directory
+  - filepath
+  - time
+  - cryptonite
+  - aeson
+  - unordered-containers
+  - vector
+  - tuple
+  - text
 
 executables:
   grappler-exe:

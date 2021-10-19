@@ -36,6 +36,16 @@ ghc-options: -Wall
 
 dependencies:
   - base >= 4.14 && < 5
+  - http-client
+  - http-client-tls
+  - http-conduit
+  - http-types
+  - time
+  - directory
+  - filepath
+  - utf8-string
+  - bytestring
+  - aeson
 
 library:
   source-dirs: lib
@@ -43,15 +53,6 @@ library:
   dependencies:
     - cryptonite
     - memory
-    - utf8-string
-    - bytestring
-    - http-types
-    - http-client
-    - http-client-tls
-    - time
-    - directory
-    - filepath
-    - aeson
     - text
 #  exposed:
 #  visibility:
@@ -71,20 +72,9 @@ executables:
 #    generated-other-modules:
     dependencies:
       - grappler
-      - http-client
-      - http-client-tls
-      - http-conduit
-      - http-types
-      - utf8-string
-      # - base16-bytestring
       - memory
-      - bytestring
       - tagsoup
-      - directory
-      - filepath
-      - time
       - cryptonite
-      - aeson
       - unordered-containers
       - vector
       - tuple

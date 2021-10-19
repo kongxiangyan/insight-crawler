@@ -12,6 +12,7 @@
   --package tuple
 -}
 
+import GHC.IO.Encoding
 import           Control.Concurrent
 import           Control.Monad
 import           Data.List
@@ -55,6 +56,8 @@ runProcess = do
   return ()
 
 main :: IO ()
-main = forever $
-  forkIO runProcess
-  >> threadDelay (30 * 10 * 1000000)
+main = do
+  setLocaleEncoding utf8
+  forever $
+    forkIO runProcess
+    >> threadDelay (30 * 10 * 1000000)

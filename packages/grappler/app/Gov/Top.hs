@@ -7,7 +7,7 @@ module Gov.Top
     emptyItem
   ) where
 
-import qualified Data.ByteString.Lazy.UTF8 as BU
+import qualified Data.ByteString.Lazy.UTF8 as LBU
 import           Data.Char
 import           Data.Time
 import           Network.HTTP.Client
@@ -42,7 +42,7 @@ setCommonProxy =  managerSetProxy  (useProxy Proxy {
 setCommonManager :: ManagerSettings -> ManagerSettings
 setCommonManager settings = settings { managerResponseTimeout = responseTimeoutMicro (30 * 1000000) }
 
-type RequestResponse = Response BU.ByteString
+type RequestResponse = Response LBU.ByteString
 data RequestResult
   = RequestResult
       { target   :: Target
@@ -80,7 +80,7 @@ execRequest = do
     scopedLog $ "The grap time(after response) was: " ++ generalFormatTime grapTime
     scopedLog $ "The response status was: " ++ show (responseStatus response)
 
-    let body = BU.toString $ responseBody response
+    let body = LBU.toString $ responseBody response
 
     destination <- pathInAppDataDir "TopGov.txt"
     writeFile destination body
