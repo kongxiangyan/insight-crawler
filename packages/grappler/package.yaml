@@ -46,6 +46,8 @@ dependencies:
   - utf8-string
   - bytestring
   - aeson
+  - warp
+  - wai
 
 library:
   source-dirs: lib

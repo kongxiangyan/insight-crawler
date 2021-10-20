@@ -10,16 +10,23 @@
   --package cryptonite
   --package aeson unordered-containers vector
   --package tuple
+  --package warp wai
 -}
 
-import GHC.IO.Encoding
 import           Control.Concurrent
 import           Control.Monad
+import qualified Data.ByteString.Char8     as LBS
+import qualified Data.ByteString.Lazy.UTF8 as LBU
 import           Data.List
-import qualified Gov.Top            as Top
+import           GHC.IO.Encoding
+import qualified Gov.Top                   as Top
 import           Notify.General
-import qualified Storage.TCBDB      as DB
+import qualified Storage.TCBDB             as DB
 import           Utils.Time
+
+import           Network.HTTP.Types
+import           Network.Wai
+import           Network.Wai.Handler.Warp
 
 runProcess :: IO ()
 runProcess = do
@@ -55,9 +62,16 @@ runProcess = do
 
   return ()
 
+listenPort :: IO ()
+listenPort = run 3000 application
+  where
+    application _ respond = respond $
+      responseLBS status200 [(hContentType, LBS.pack "text/plain")] (LBU.fromString "Hello World")
+
 main :: IO ()
 main = do
   setLocaleEncoding utf8
+  _ <- forkIO listenPort
   forever $
     forkIO runProcess
     >> threadDelay (30 * 10 * 1000000)

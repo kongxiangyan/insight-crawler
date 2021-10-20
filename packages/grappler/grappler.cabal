@@ -59,6 +59,8 @@ library
     , text
     , time
     , utf8-string
+    , wai
+    , warp
   default-language: Haskell2010
 
 executable grappler-exe
@@ -91,6 +93,8 @@ executable grappler-exe
     , unordered-containers
     , utf8-string
     , vector
+    , wai
+    , warp
   default-language: Haskell2010
 
 test-suite grappler-test
@@ -114,4 +118,6 @@ test-suite grappler-test
     , http-types
     , time
     , utf8-string
+    , wai
+    , warp
   default-language: Haskell2010

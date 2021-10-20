@@ -44,6 +44,8 @@ dependencies:
   - vector
   - tuple
   - text
+  - warp
+  - wai
 
 executables:
   grappler-exe:
