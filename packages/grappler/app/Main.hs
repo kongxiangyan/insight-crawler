@@ -1,4 +1,4 @@
-#!/usr/bin/env stack
+
 {-stack
   script
   --resolver lts-18.6
@@ -36,8 +36,14 @@ runProcess = do
   latestItem <- DB.getLatestItem
 
   -- 从抓取的内容中筛选新的条目
-  let Top.Item (_, _, latestPublishTime, _) = latestItem
-  let newerItems = filter (\(Top.Item (_, _, t, _)) -> t > latestPublishTime) grappledItems
+  -- 抓取到的数据条目，发布时间只能精确到 Day，为了避免一天之内发布多条政策只被采集一条的情况，
+  -- 在筛选新条目的时候，日期比对要使用 “>=”，而不是 “>”
+  -- 使用 “>=” 比对日期的话，需要通过其它方式再进行一次筛选，避免数据的重复录入
+  -- 这里采用“title + url”作为比对的依据，如果两条数据“title + url”不同，就认为它们是不同的条目
+  let Top.Item (latestItemTitle, latestItemUrl, latestItemPublishTime, _) = latestItem
+  let newerItems = filter (\(Top.Item (t, u, _, _)) -> (t ++ u) /= (latestItemTitle ++ latestItemUrl))
+                  . filter (\(Top.Item (_, _, t, _)) -> t >= latestItemPublishTime)
+                  $ grappledItems
 
   print $ "latestItem is: " ++ show latestItem
   print $ "newerItems / totalItems: " ++ show (length newerItems) ++ "/" ++ show (length grappledItems)
@@ -53,6 +59,7 @@ runProcess = do
         where
           makeMes [Top.Item (title, url, publishTime, _)] =
             "[" ++ (generalFormatDate . timestampToUTC $ publishTime) ++ "] " ++ title ++ ": " ++ url
+          -- TODO: 完善一次性抓取到多条数据的情况下为企业微信推送的消息的格式
           makeMes items@(_ : _)                  = DB.itemsToJSON items
           makeMes _                              = ""
 
