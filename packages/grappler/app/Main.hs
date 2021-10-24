@@ -1,4 +1,4 @@
-
+#!/usr/bin/env stack
 {-stack
   script
   --resolver lts-18.6
