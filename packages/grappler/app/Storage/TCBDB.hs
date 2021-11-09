@@ -85,8 +85,8 @@ getLatestItem = do
   responseBody <- R.post requestSettings {
       path = "/databases/" ++
               govStrategiesCollectionName ++
-              "/documents:find?limit=1&sort={\"publishTime\":-1}",
-              -- 按发布时间降序排列，取发布时间的时间戳最大的一条记录
+              "/documents:find?limit=1&sort={\"publishTime\":-1,\"grapTime\":-1}",
+              -- 按发布时间降序排列，发布时间相同的按照抓取时间降序，取时间最近的一条记录
       requestBody = TCBDB.query "{}"
     }
 

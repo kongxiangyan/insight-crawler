@@ -40,13 +40,15 @@ runProcess = do
   -- 在筛选新条目的时候，日期比对要使用 “>=”，而不是 “>”
   -- 使用 “>=” 比对日期的话，需要通过其它方式再进行一次筛选，避免数据的重复录入
   -- 这里采用“title + url”作为比对的依据，如果两条数据“title + url”不同，就认为它们是不同的条目
+  -- TODO: 优化重复数据的检测方式
   let Top.Item (latestItemTitle, latestItemUrl, latestItemPublishTime, _) = latestItem
-  let newerItems = filter (\(Top.Item (t, u, _, _)) -> (t ++ u) /= (latestItemTitle ++ latestItemUrl))
+  let newerItems = takeWhile (\(Top.Item (t, u, _, _)) -> (t ++ u) /= (latestItemTitle ++ latestItemUrl))
                   . filter (\(Top.Item (_, _, t, _)) -> t >= latestItemPublishTime)
                   $ grappledItems
 
-  print $ "latestItem is: " ++ show latestItem
-  print $ "newerItems / totalItems: " ++ show (length newerItems) ++ "/" ++ show (length grappledItems)
+  putStrLn $ "latestItem is: " ++ show latestItem
+  putStrLn $ "newerItems are: " ++ show newerItems
+  putStrLn $ "newerItems / totalItems: " ++ show (length newerItems) ++ "/" ++ show (length grappledItems)
 
   -- 按照发布时间升序排列，如果要降序的话，使用 Data.Ord.Down 即可
   let sortedItems = sortOn (\(Top.Item (_, _, t, _)) -> t) newerItems
